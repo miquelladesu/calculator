@@ -22,15 +22,23 @@ class Calculator:
                 # If running as script
                 application_path = os.path.dirname(os.path.abspath(__file__))
 
+            assets_path = os.path.join(application_path, 'assets')
+
             # icon formats based on platform
             if sys.platform.startswith('win'):
-                icon_path = os.path.join(application_path, 'assets', 'calculator.ico')
+                icon_file = 'calculator.ico'
             else:
-                icon_path = os.path.join(application_path, 'assets', 'calculator.png')
+                icon_file = 'calculator.png'
+
+            icon_path = os.path.join(assets_path, icon_file)
 
             if os.path.exists(icon_path):
-                self.window.iconbitmap(icon_path) if sys.platform.startswith('win') else \
+                if sys.platform.startswith('win'):
+                    self.window.iconbitmap(icon_path)
+                else:
                     self.window.tk.call('wm', 'iconphoto', self.window._w, tk.PhotoImage(file=icon_path))
+            else:
+                print(f"Warning: Icon file not found at {icon_path}")
         except Exception as e:
             print(f"Could not load application icon: {e}")
 

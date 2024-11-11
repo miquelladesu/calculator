@@ -1,0 +1,108 @@
+# .github/workflows/build.yml
+name: Build and Release Calculator App
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    name: Build for Windows
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'  # Specify your Python version
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+
+      - name: Build Executable
+        run: |
+          pyinstaller --onefile --windowed --icon=assets/calculator.ico --add-data "assets:assets" calculator.py
+        shell: cmd
+
+      - name: Upload Windows Executable
+        uses: actions/upload-artifact@v3
+        with:
+          name: calculator-windows
+          path: dist\calculator.exe
+
+  build-linux:
+    runs-on: ubuntu-latest
+    name: Build for Linux
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'  # Specify your Python version
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+
+      - name: Build Executable
+        run: |
+          pyinstaller --onefile --windowed --icon=assets/calculator.png --add-data "assets:assets" calculator.py
+
+      - name: Upload Linux Executable
+        uses: actions/upload-artifact@v3
+        with:
+          name: calculator-linux
+          path: dist/calculator
+
+  release:
+    needs: [build-windows, build-linux]
+    runs-on: ubuntu-latest
+    name: Create GitHub Release
+    steps:
+      - name: Download Windows Executable
+        uses: actions/download-artifact@v3
+        with:
+          name: calculator-windows
+
+      - name: Download Linux Executable
+        uses: actions/download-artifact@v3
+        with:
+          name: calculator-linux
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          release_name: ${{ github.event.release.name }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Windows Executable to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/calculator.exe
+          asset_name: calculator-windows.exe
+          asset_content_type: application/vnd.microsoft.portable-executable
+
+      - name: Upload Linux Executable to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/calculator
+          asset_name: calculator-linux
+          asset_content_type: application/octet-stream
