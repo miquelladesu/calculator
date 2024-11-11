@@ -1,5 +1,3 @@
+# Calculator
 
-# Modern Calculator
-
-A clean, simple calculator built with Python and Tkinter.
-
+A clean, modern calculator application built with Python and Tkinter featuring a dark theme and smooth operations.
