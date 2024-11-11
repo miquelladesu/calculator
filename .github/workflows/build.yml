@@ -71,11 +71,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: calculator-windows
+          path: windows
 
       - name: Download Linux Executable
         uses: actions/download-artifact@v3
         with:
           name: calculator-linux
+          path: linux
 
       - name: Create Release
         id: create_release
@@ -94,7 +96,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/calculator.exe
+          asset_path: windows/calculator.exe
           asset_name: calculator-windows.exe
           asset_content_type: application/vnd.microsoft.portable-executable
 
@@ -104,6 +106,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/calculator
+          asset_path: linux/calculator
           asset_name: calculator-linux
           asset_content_type: application/octet-stream
