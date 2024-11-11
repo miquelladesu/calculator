@@ -2,8 +2,9 @@
 name: Build and Release Calculator App
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - master
 
 jobs:
   build-windows:
@@ -16,7 +17,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'  # Specify your Python version
+          python-version: '3.x'
 
       - name: Install Dependencies
         run: |
@@ -44,7 +45,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'  # Specify your Python version
+          python-version: '3.x'
 
       - name: Install Dependencies
         run: |
@@ -82,8 +83,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.event.release.tag_name }}
-          release_name: ${{ github.event.release.name }}
+          tag_name: v1.${{ github.run_number }}
+          release_name: Calculator v1.${{ github.run_number }}
           draft: false
           prerelease: false
 
